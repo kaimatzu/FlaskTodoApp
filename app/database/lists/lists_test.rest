@@ -1,36 +1,31 @@
 @host = http://127.0.0.1:5000
 
 ### Create a new item
-POST {{host}}/users
+POST {{host}}/lists
 Content-Type: application/json
 
 {
-  "name": "karl",
-  "email": "karlito@cit.edu",
-  "password": "123456"
+  "title": "karl",
+  "user_id": 2
 }
 
-### Read the list
-GET {{host}}/users
+### Read all the lists of a user
+GET {{host}}/lists
 Content-Type: application/json
 
-
 ### Read a single item by id
-GET {{host}}/users/1
+GET {{host}}/lists/5
 Content-Type: application/json
 
 
 ### Update an item
-PUT {{host}}/users/1
+PUT {{host}}/lists/1
 Content-Type: application/json
 
 {
-  "name": "karlnew",
-  "email": "karlnew@gmail.com",
-  "password": "123456"
+  "title": "test"
 }
 
-
 ### Delete an item
-DELETE {{host}}/users/1
+DELETE {{host}}/lists/1
 Content-Type: application/json

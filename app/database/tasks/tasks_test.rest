@@ -1,0 +1,45 @@
+@host = http://127.0.0.1:5000
+
+### Create a new task
+POST {{host}}/tasks
+Content-Type: application/json
+
+{
+  "content": "Sample task",
+  "list_id": 5,
+  "parent_task_id": null
+}
+
+### Create a new sub task
+POST {{host}}/tasks
+Content-Type: application/json
+
+{
+  "content": "Sample subtask",
+  "list_id": 5,
+  "parent_task_id": 4
+}
+
+### Read all the tasks of a list
+GET {{host}}/tasks
+Content-Type: application/json
+
+### Read all the subtasks of a task
+GET {{host}}/tasks/subtasks/4
+Content-Type: application/json
+
+### Read a single item by id
+GET {{host}}/tasks/4
+Content-Type: application/json
+
+### Update an item
+PUT {{host}}/tasks/4
+Content-Type: application/json
+
+{
+  "content": "test content"
+}
+
+### Delete an item
+DELETE {{host}}/tasks/4
+Content-Type: application/json

@@ -1,0 +1,30 @@
+@host = http://127.0.0.1:5000
+
+### Create a new note
+POST {{host}}/notes
+Content-Type: application/json
+
+{
+  "content": "Sample note",
+  "task_id": 4
+}
+
+### Read all the notes of a task
+GET {{host}}/notes
+Content-Type: application/json
+
+### Read a single item by id
+GET {{host}}/notes/2
+Content-Type: application/json
+
+### Update an item
+PUT {{host}}/notes/1
+Content-Type: application/json
+
+{
+  "content": "new note content"
+}
+
+### Delete an item
+DELETE {{host}}/notes/1
+Content-Type: application/json

@@ -8,11 +8,11 @@ def create_user(data):
   return data
 
 def get_all_users():
-  rv = fetchall("""SELECT * FROM users_view""")
+  rv = fetchall("""SELECT * FROM user_view""")
   return rv
 
 def get_user_by_id(id):
-  rv = fetchone("""SELECT * FROM users_view WHERE id = %s""", (id,))
+  rv = fetchone("""SELECT * FROM user_view WHERE id = %s""", (id,))
   return rv
 
 def update_user(id, data):

@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask
 from app.database.db import set_database
-from app.database.users.users import get_all_users, get_user_by_id, create_user, update_user, delete_user
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 from os import getenv
@@ -22,30 +21,17 @@ app.config["MYSQL_AUTOCOMMIT"] = True if getenv("MYSQL_AUTOCOMMIT") == "True" el
 mysql = MySQL(app)
 set_database(mysql)
 
-from app.routes.login_route import login 
-app.route("/")(login)
+from app.routes.frontend.login_route import login_route
+app.route("/")(login_route.login)
 
-@app.route("/users", methods=["GET", "POST"])
-def users():
-  if request.method == "POST":
-    data = request.get_json()
-    result = create_user(data)
-  else:
-    result = get_all_users()
-  return jsonify(result)
+from app.routes.backend.users_route import users_route
+app.route("/users")(users_route)
 
+from app.routes.backend.lists_route import lists_route
+app.route("/lists")(lists_route)
 
-@app.route("/users/<id>", methods=["GET", "PUT", "DELETE"])
-def users_by_id(id):
-  if request.method == "PUT":
-    data = request.get_json()
-    result = update_user(id, data)
-  elif request.method == "DELETE":
-    result = get_user_by_id(id)
-    if result is not None:
-      result = delete_user(id)
-    else:
-      result = {"error": "User not found"}
-  else:
-    result = get_user_by_id(id)
-  return jsonify(result)
+from app.routes.backend.tasks_route import tasks_route
+app.route("/tasks")(tasks_route)
+
+from app.routes.backend.notes_route import notes_route
+app.route("/notes")(notes_route)
