@@ -15,13 +15,13 @@ POST {{host}}/tasks
 Content-Type: application/json
 
 {
-  "content": "Sample subtask",
+  "content": "Sample subtask of the subtask of the subtask :D", // limit exceeded
   "list_id": 5,
-  "parent_task_id": 4
+  "parent_task_id": 47
 }
 
 ### Read all the tasks of a list
-GET {{host}}/tasks
+GET {{host}}/tasks/all/5
 Content-Type: application/json
 
 ### Read all the subtasks of a task
@@ -41,5 +41,5 @@ Content-Type: application/json
 }
 
 ### Delete an item
-DELETE {{host}}/tasks/4
+DELETE {{host}}/tasks/27
 Content-Type: application/json

@@ -5,12 +5,12 @@ POST {{host}}/lists
 Content-Type: application/json
 
 {
-  "title": "karl",
+  "title": "new list",
   "user_id": 2
 }
 
 ### Read all the lists of a user
-GET {{host}}/lists
+GET {{host}}/lists/all/2
 Content-Type: application/json
 
 ### Read a single item by id

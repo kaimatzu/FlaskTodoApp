@@ -1,0 +1,127 @@
+<div name="dashboard" data-user-id="{{ session['user_id'] }}" data-first-list-title="{{ user_lists[0].list_title }}" data-first-list-id="{{ user_lists[0].list_id }}">
+    hello, {{ name }}!
+
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-md-12">
+                    <div class="add-lists d-flex">
+                        <div class="dropdown mr-5">
+                            <button
+                                class="btn btn-transparent dropdown-toggle"
+                                type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                                {% if user_lists|length > 0 %}
+                                    {{ user_lists[0].list_title }}
+                                {% else %}
+                                    No lists yet...
+                                {% endif %}
+                            </button>
+                            <div class="dropdown-menu"
+                                aria-labelledby="dropdownMenuButton"
+                                id="dropdownList"
+                                current-selected="{{user_lists[0].list_id}}">
+                                {% for option in user_lists %}
+                                <a class="dropdown-item" data-list-id="{{ option.list_id }}"
+                                    onclick="updateSelectedList('{{ option.list_title }}', '{{ option.list_id }}')">{{
+                                    option.list_title }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <input type="text"
+                            class="form-control add-list-input mr-2"
+                            placeholder="New list"
+                            id="newListInput">
+                        <button
+                            class="add btn btn-primary font-weight-bold user-list-add-btn"
+                            onclick="addNewList()">
+                            Add new list</button>
+                    </div>
+                    <br>
+                    <div class="card px-3">
+                        <div class="card-body">
+                            <label id="deleteListLabel" class="card-title"> Delete List </label>
+                            <div class="add-items d-flex"> <input type="text"
+                                    class="form-control todo-list-input"
+                                    placeholder="What do you need to do today?"
+                                    id="newTaskInput">
+                                <button
+                                    class="add btn btn-primary font-weight-bold todo-list-add-btn">Add
+                                    new task</button>
+                            </div>
+                            <div class="list-wrapper">
+                                <ul class="d-flex flex-column-reverse todo-list" id="taskList">
+                                    <!-- <li>
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox"> For what
+                                                reason would it be advisable. <i
+                                                    class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li>
+                                    <li class="completed">
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox" checked> For
+                                                what reason would it be
+                                                advisable for me to think. <i
+                                                    class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li>
+                                    <li>
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox"> it be
+                                                advisable for me to think about
+                                                business content? <i
+                                                    class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li>
+                                    <li>
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox"> Print
+                                                Statements all <i
+                                                    class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li>
+                                    <li class="completed">
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox" checked>
+                                                Call Rampbo <i
+                                                    class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li>
+                                    <li>
+                                        <div class="form-check"> <label
+                                                class="form-check-label"> <input
+                                                    class="checkbox"
+                                                    type="checkbox"> Print bills
+                                                <i class="input-helper"></i></label>
+                                        </div> <i
+                                            class="remove mdi mdi-close-circle-outline"></i>
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>

@@ -21,7 +21,8 @@ SELECT
   tasks.id AS task_id,
   tasks.content AS task_content,
   tasks.parent_task_id as parent_task_id,
-  tasks.level as task_depth_level
+  tasks.finished as finished,
+  tasks.level as task_depth_level,
   lists.id AS list_id,
   lists.title AS list_title
 FROM

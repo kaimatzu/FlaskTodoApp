@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from app.database.users.users import get_all_users, get_user_by_id, create_user, update_user, delete_user
+from app.database.users.users import get_all_users, get_user_by_id, get_user_by_username, create_user, update_user, delete_user
 from app.main import app
 
 @app.route("/users", methods=["GET", "POST"])
@@ -25,4 +25,9 @@ def users_by_id(id):
       result = {"error": "User not found"}
   else:
     result = get_user_by_id(id)
+  return jsonify(result)
+
+@app.route("/users/get/<username>", methods=["GET"])
+def users_by_username(username):
+  result = get_user_by_username(username)
   return jsonify(result)

@@ -6,7 +6,7 @@ CREATE TABLE `persons` (
 
 CREATE TABLE `users` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `username` varchar(255),
+  `username` varchar(255) UNIQUE,
   `password` varchar(255),
   `person_id` integer UNIQUE
 );
@@ -21,6 +21,7 @@ CREATE TABLE `tasks` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `content` varchar(255),
   `list_id` integer,
+  `finished` boolean DEFAULT 0,
   `parent_task_id` integer DEFAULT null,
   `level` integer DEFAULT 0 -- for limiting the depth of the subtasks
 );

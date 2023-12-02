@@ -15,6 +15,10 @@ def get_user_by_id(id):
   rv = fetchone("""SELECT * FROM user_view WHERE id = %s""", (id,))
   return rv
 
+def get_user_by_username(username):
+  rv = fetchone("""SELECT * FROM user_view WHERE username = %s""", (username,))
+  return rv
+
 def update_user(id, data):
   cur = execute("""CALL update_user(%s, %s, %s, %s, %s)""",
           (id, data["name"], data["email"], data["email"], data["password"]))

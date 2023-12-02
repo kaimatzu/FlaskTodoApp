@@ -1,12 +1,17 @@
+from datetime import timedelta
 from flask import Flask
 from app.database.db import set_database
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
+import requests
 from os import getenv
+import secrets
 
 
 app = Flask(__name__)
-
+app.secret_key = secrets.token_hex(16)
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 load_dotenv()
 
 app.config["MYSQL_HOST"] = getenv("MYSQL_HOST")
@@ -23,6 +28,9 @@ set_database(mysql)
 
 from app.routes.frontend.login_route import login_route
 app.route("/")(login_route.login)
+
+from app.routes.frontend.dashboard_route import dashboard_route
+app.route("/dashboard")(dashboard_route)
 
 from app.routes.backend.users_route import users_route
 app.route("/users")(users_route)

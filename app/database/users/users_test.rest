@@ -19,6 +19,9 @@ Content-Type: application/json
 GET {{host}}/users/1
 Content-Type: application/json
 
+### Read a single item by username
+GET {{host}}/users/get/karlito@cit.edu
+Content-Type: application/json
 
 ### Update an item
 PUT {{host}}/users/1
