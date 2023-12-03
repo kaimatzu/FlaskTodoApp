@@ -4,6 +4,7 @@ from app.main import app
 
 @app.route("/")
 def login():
+    session['user_id'] = None
     title = "Login"
     content = render_template("login/login.html")
     return render_template('index.html', title=title, content=content, stylesheet="login.css")
@@ -13,8 +14,6 @@ def auth():
     username = request.form.get("username")
     password = request.form.get("password")
     
-    # Perform authentication logic, check username and password against database, etc.
-    # Assuming you retrieve user_id during authentication
     user_id = authenticate(username, password)
 
     if user_id is not None:
@@ -22,7 +21,9 @@ def auth():
         session['user_id'] = user_id
         return redirect(url_for('dashboard'))  # Redirect to the dashboard or any other route after successful login
     else:
-        return render_template('login/login.html', message='Invalid credentials')  # Handle invalid credentials
+        title = "Login"
+        content = render_template("login/login.html", message='Invalid credentials')
+        return render_template('index.html', title=title, content=content, stylesheet="login.css")
     
 def authenticate(username, password):
     user_info = get_user_by_username(username)

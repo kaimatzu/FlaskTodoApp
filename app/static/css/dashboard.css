@@ -414,3 +414,30 @@ input[type="checkbox"] {
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown .dropdown-item {
     display: flex !important;
 }
+
+
+.note-item {
+    position: relative;
+    width: 100%;
+    /* margin-bottom: 2px; */
+}
+
+.expandable-div {
+    min-height: 1em; 
+    max-height: 100px; 
+    /* min-width: 100%; */
+    width: 100%;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.top-app-bar a {
+    margin-right: 10px;
+}
+
+.top-app-bar .app-bar-logout:hover{
+    cursor: pointer;
+    color: #405189 !important; 
+    text-decoration: underline !important;
+}

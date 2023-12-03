@@ -16,8 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // New list
     const newListInput = document.querySelector(".add-list-input");
     const newListAddBtn = document.querySelector(".user-list-add-btn");
-
     const deleteListBtn = document.getElementById("deleteListLabel");
+
+	// New note 
+	const noteListItem = document.querySelector(".notes-list");
+	const newNoteInput = document.querySelector(".add-note-input");
+	const newNoteAddBtn = document.querySelector(".task-note-add-btn");
 
     todoListAddBtn.addEventListener("click", function (event) {
         addNewTask(null)
@@ -82,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 dropdownList.appendChild(newDropdownItem);
 
                 // Clear the input field after adding the item
-                document.getElementById("newListInput").value = "";
+                newListInput.value = "";
 
                 // Make UI visible if not already
                 const cardBody = document.querySelector(".card-body");
@@ -110,6 +114,28 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
+	newNoteAddBtn.addEventListener("click", function (event) {
+		addNewNote()
+			.then(function (note) {
+			const notesList = document.getElementById("notesList");
+				console.log(note)
+				const noteItem = document.createElement("li");
+				newNoteInput.value = "";
+				noteItem.innerHTML = `
+					<li>
+						<div class="note-item d-flex justify-content-center" data-note-id="${note.id}">
+							<div class="expandable-div" contenteditable="true">${note.content}</div>
+							<i class="remove mdi mdi-close-circle-outline" ></i>
+						</div>
+					</li>
+				`;
+				notesList.appendChild(noteItem);
+			})
+			.catch(function (error) {
+                console.error("Error in addNewNote:", error);
+            });
+	});
+
     todoListItem.addEventListener("change", function (event) {
         var checkbox = event.target;
         if (checkbox.checked) {
@@ -124,9 +150,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     todoListItem.addEventListener("click", function (event) {
         var target = event.target;
-        if (target.classList.contains("form-open-dialog-label")) {
-            console.log("pls");
+        if (target.classList.contains("form-open-dialog-label")) { // <---- MARKER: GETTING NOTES
+			const listItem = target.parentNode.parentNode;
+			const titleItem = target.parentNode;
+			console.log(listItem)
             // TODO: Add dialog for opening and adding notes
+			openModal(target.textContent, listItem.getAttribute("data-task-id"))
         }
 
         if (target.classList.contains("remove")) {
@@ -169,6 +198,18 @@ document.addEventListener("DOMContentLoaded", function () {
             listItem.remove();
         }
     });
+
+	noteListItem.addEventListener("click", function (event) {
+		var target = event.target;
+		const noteItem = target.parentNode.parentNode;
+		const noteId = target.parentNode.getAttribute("data-note-id");
+
+		if (target.classList.contains("remove")) {
+			console.log(noteItem);
+			deleteNote(noteId);
+			noteItem.remove();
+		}
+	});
 
     deleteListBtn.addEventListener("click", function (event) {
         const currentSelectedList = document
@@ -314,7 +355,7 @@ function getListItems(listId) {
                                     }>
                                     <i class="input-helper"></i>
                                 </label>
-                                <label class="form-open-dialog-label">
+                                <label class="form-open-dialog-label"">
                                     ${task.task_content}
                                     <i class="input-helper"></i>
                                 </label>
@@ -353,6 +394,36 @@ function getListItems(listId) {
         .catch((error) => {
             console.error("Error fetching tasks:", error);
         });
+}
+
+function getTaskNotes(taskId) {
+	fetch("/notes/all/" + taskId, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+	.then((response) => response.json())
+	.then((data) => {
+		const notesList = document.getElementById("notesList");
+		notesList.innerHTML = ""; // Clear existing notes
+		data.forEach((note) => {
+			const noteItem = document.createElement("li");
+			noteItem.innerHTML = `
+				<li>
+					<div class="note-item d-flex justify-content-center" data-note-id="${note.note_id}">
+						<div class="expandable-div" contenteditable="true">${note.note_content}</div>
+						<i class="remove mdi mdi-close-circle-outline" ></i>
+					</div>
+				</li>
+			`;
+			notesList.appendChild(noteItem);
+		})
+
+	})
+	.catch((error) => {
+		console.error("Error fetching notes:", error);
+	});
 }
 
 function addNewSubTask() {
@@ -502,6 +573,52 @@ function addNewTask(parentTaskId) {
     });
 }
 
+function addNewNote() {
+	return new Promise((resolve, reject) => {
+		var newItemContent = document.getElementById("newNoteInput").value;
+		const modal = document.getElementById('overlayModal');
+		const taskId = modal.getAttribute("data-current-task-id");
+		if (newItemContent.trim() !== "") {
+			var postData = {
+                content: newItemContent,
+                task_id: taskId,
+            };
+
+			fetch("/notes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(postData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Server response:", data);
+                    console.log("Returned ID:", data.id);
+                    resolve(data); // Resolve the promise with the ID
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    reject(error); // Reject the promise with the error
+                });
+		} else {
+			reject(new Error("Invalid input for new task")); // Reject the promise with an error
+		}
+	});
+}
+
+function openModal(taskName, taskId) {
+	// Set the dynamic content inside the modal
+	const modal = document.getElementById('overlayModal');
+	modal.setAttribute("data-current-task-id", taskId);
+	const modalTitle = document.getElementById('noteOverlayTitle');
+	modalTitle.textContent = "Notes for " + taskName;
+
+	getTaskNotes(taskId);
+	// Trigger the modal to show
+	$('#overlayModal').modal('show');
+}
+
 function deleteList(listId) {
     fetch("/lists/" + listId, {
         method: "DELETE",
@@ -520,6 +637,22 @@ function deleteList(listId) {
 
 function deleteTask(taskId) {
     fetch("/tasks/" + taskId, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function deleteNote(noteId) {
+	fetch("/notes/" + noteId, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",

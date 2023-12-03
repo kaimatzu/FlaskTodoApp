@@ -41,3 +41,14 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.error-message {
+    color: red !important;
+    font-weight: bold !important;
+}
+
+.register-link:hover {
+    cursor: pointer;
+    color: #0056b3 !important;
+    text-decoration: underline !important;
+}

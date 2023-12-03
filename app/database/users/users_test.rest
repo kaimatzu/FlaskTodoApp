@@ -5,8 +5,8 @@ POST {{host}}/users
 Content-Type: application/json
 
 {
-  "name": "karl",
-  "email": "karlito@cit.edu",
+  "name": "karl new",
+  "email": "karlito2@cit.edu",
   "password": "123456"
 }
 

@@ -5,7 +5,54 @@
      {% endif %}>
     <!-- Other content here -->
 </div>
-    hello, {{ name }}!
+    <div class="top-app-bar d-flex justify-content-left">
+        <a class="app-bar-name">hello, {{ name }}!</a>
+        <a class="app-bar-logout" href="/">logout</a>
+    </div>
+
+
+
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#overlayModal">
+        Open Overlay
+    </button> -->
+      
+    <!-- Modal for viewing notes -->
+    <div class="modal" id="overlayModal" tabindex="-1" role="dialog" aria-labelledby="overlayModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <!-- Your overlay content goes here -->
+                    <h4 class="note-overlay-title" id="noteOverlayTitle">Notes for [Title]</h4>
+                    <div class="note-input-group d-flex justify-content-center">
+                        <input type="text"
+                            class="form-control add-note-input mr-2"
+                            placeholder="New note"
+                            id="newNoteInput">
+                        <button
+                            class="add btn btn-primary font-weight-bold task-note-add-btn">
+                            Add new note</button>
+                    </div>
+
+                    <div class="list-wrapper">
+                        <ul class="d-flex flex-column-reverse notes-list" id="notesList">
+                            <li>
+                                <div class="note-item d-flex justify-content-center">
+                                    <div class="expandable-div" contenteditable="true"></div>
+                                    <i class="remove mdi mdi-close-circle-outline" ></i>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="note-item d-flex justify-content-center">
+                                    <div class="expandable-div" contenteditable="true"></div>
+                                    <i class="remove mdi mdi-close-circle-outline" ></i>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="page-content page-container" id="page-content">
         <div class="padding">

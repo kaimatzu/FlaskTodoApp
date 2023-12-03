@@ -1,4 +1,5 @@
 from app.database.db import fetchall, fetchone, execute
+import MySQLdb as mdb
 
 def create_user(data):
   cur = execute("""CALL create_user(%s, %s, %s, %s)""",

@@ -29,6 +29,10 @@ set_database(mysql)
 from app.routes.frontend.login_route import login_route
 app.route("/")(login_route.login)
 
+from app.routes.frontend.register_route import register_route
+app.route("/register")(register_route.register)
+# app.route("/register")(register_route.auth_register)
+
 from app.routes.frontend.dashboard_route import dashboard_route
 app.route("/dashboard")(dashboard_route)
 

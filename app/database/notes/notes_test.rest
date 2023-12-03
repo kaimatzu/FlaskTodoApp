@@ -6,15 +6,15 @@ Content-Type: application/json
 
 {
   "content": "Sample note",
-  "task_id": 4
+  "task_id": 116
 }
 
 ### Read all the notes of a task
-GET {{host}}/notes
+GET {{host}}/notes/all/116
 Content-Type: application/json
 
 ### Read a single item by id
-GET {{host}}/notes/2
+GET {{host}}/notes/3
 Content-Type: application/json
 
 ### Update an item
