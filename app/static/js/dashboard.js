@@ -7,23 +7,33 @@ document.addEventListener("DOMContentLoaded", function () {
             .getAttribute("data-first-list-id")
     );
 
-    var todoListItem = document.querySelector(".todo-list");
-    var todoListInput = document.querySelector(".todo-list-input");
-    var todoListAddBtn = document.querySelector(".todo-list-add-btn");
-    var deleteListBtn = document.getElementById("deleteListLabel");
+    const todoListItem = document.querySelector(".todo-list");
+
+    // New task
+    const todoListInput = document.querySelector(".todo-list-input");
+    const todoListAddBtn = document.querySelector(".todo-list-add-btn");
+
+    // New list
+    const newListInput = document.querySelector(".add-list-input");
+    const newListAddBtn = document.querySelector(".user-list-add-btn");
+
+    const deleteListBtn = document.getElementById("deleteListLabel");
 
     todoListAddBtn.addEventListener("click", function (event) {
-        console.log("test");
         addNewTask(null)
             .then(function (task) {
                 event.preventDefault();
+                console.log("test");
                 // var task = todoListInput.value;
                 console.log(task);
                 if (task) {
                     const listItem = document.createElement("li");
                     listItem.setAttribute("data-task-id", task.id);
-                    listItem.setAttribute("data-parent-task-id", task.parent_task_id);
-                    listItem.setAttribute("data-task-depth-level", 0)
+                    listItem.setAttribute(
+                        "data-parent-task-id",
+                        task.parent_task_id
+                    );
+                    listItem.setAttribute("data-task-depth-level", 0);
                     listItem.setAttribute("class", "ml-" + 0);
                     listItem.innerHTML = `
                         <div class="form-check d-flex justify-content-left">
@@ -51,6 +61,55 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
+    newListAddBtn.addEventListener("click", function (event) {
+        addNewList()
+            .then(function (list) {
+                event.preventDefault();
+                // --HTML part--
+                var dropdownList = document.getElementById("dropdownList");
+
+                // Create a new dropdown item
+                var newDropdownItem = document.createElement("a");
+                newDropdownItem.classList.add("dropdown-item");
+                newDropdownItem.setAttribute("data-list-id", list.id);
+                // newDropdownItem.href = "#";
+                newDropdownItem.textContent = list.title;
+                newDropdownItem.onclick = function () {
+                    updateSelectedList(list.title, list.id);
+                };
+
+                // Append the new item to the dropdown menu
+                dropdownList.appendChild(newDropdownItem);
+
+                // Clear the input field after adding the item
+                document.getElementById("newListInput").value = "";
+
+                // Make UI visible if not already
+                const cardBody = document.querySelector(".card-body");
+                console.log(cardBody);
+                cardBody.classList.remove("d-none");
+
+                // Check if this is the first element in dropdown menu
+                const dropdownMenu = document.querySelector(".dropdown-menu");
+                const numberOfChildren = dropdownMenu.children.length;
+				console.log("num of lists: ", numberOfChildren);
+                if (numberOfChildren == 1) {
+                    const dashboard = document.querySelector('[name="dashboard"]');
+                    dashboard.setAttribute(
+                        "data-first-list-title",
+                        list.title
+                    );
+                    dashboard.setAttribute(
+                        "data-first-list-id",
+                        list.id
+                    );
+                }
+            })
+            .catch(function (error) {
+                console.error("Error in addNewList:", error);
+            });
+    });
+
     todoListItem.addEventListener("change", function (event) {
         var checkbox = event.target;
         if (checkbox.checked) {
@@ -67,22 +126,25 @@ document.addEventListener("DOMContentLoaded", function () {
         var target = event.target;
         if (target.classList.contains("form-open-dialog-label")) {
             console.log("pls");
+            // TODO: Add dialog for opening and adding notes
         }
 
         if (target.classList.contains("remove")) {
             var listItem = target.parentNode.parentNode;
             var depthLevel = listItem.getAttribute("data-task-depth-level");
-            // TODO: Fix issue with taskId
-            if(depthLevel == 0){
+            if (depthLevel == 0) {
                 const taskId = listItem.getAttribute("data-task-id");
-                const subTasks = document.querySelectorAll(`[data-parent-task-id="${taskId}"]`);
-    
+                const subTasks = document.querySelectorAll(
+                    `[data-parent-task-id="${taskId}"]`
+                );
+
                 // Remove each subtask element
-                subTasks.forEach(subTask => {
-                    
+                subTasks.forEach((subTask) => {
                     const taskId = subTask.getAttribute("data-task-id");
-                    const subTasks = document.querySelectorAll(`[data-parent-task-id="${taskId}"]`);
-                    subTasks.forEach(subTask => {
+                    const subTasks = document.querySelectorAll(
+                        `[data-parent-task-id="${taskId}"]`
+                    );
+                    subTasks.forEach((subTask) => {
                         //level 2 deletion
                         subTask.remove();
                     });
@@ -90,13 +152,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     // level 1 deletion
                     subTask.remove();
                 });
-            }
-            else if (depthLevel == 1){
+            } else if (depthLevel == 1) {
                 const taskId = listItem.getAttribute("data-task-id");
-                const subTasks = document.querySelectorAll(`[data-parent-task-id="${taskId}"]`);
-    
+                const subTasks = document.querySelectorAll(
+                    `[data-parent-task-id="${taskId}"]`
+                );
+
                 // Remove each subtask element
-                subTasks.forEach(subTask => {
+                subTasks.forEach((subTask) => {
                     //level 2 deletion
                     subTask.remove();
                 });
@@ -107,25 +170,71 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    deleteListBtn.addEventListener("click", function(event) {
-        const currentSelectedList = document.getElementById("dropdownList").getAttribute("current-selected")
-        const firstListTitle = document.querySelector('[name="dashboard"]').getAttribute("data-first-list-title")
-        const firstListId = document.querySelector('[name="dashboard"]').getAttribute("data-first-list-id")
+    deleteListBtn.addEventListener("click", function (event) {
+        const currentSelectedList = document
+            .getElementById("dropdownList")
+            .getAttribute("current-selected");
         deleteList(currentSelectedList);
-        document.querySelector(`.dropdown-item[data-list-id="${currentSelectedList}"]`).remove();
-        updateSelectedList(firstListTitle, firstListId);
+
+        // Update UI
+        const dashboard = document.querySelector('[name="dashboard"]');
+        const firstListTitle = dashboard.getAttribute("data-first-list-title");
+        const firstListId = dashboard.getAttribute("data-first-list-id");
+        if (currentSelectedList != firstListId) {
+            // Set to first list if deleted list is not the first list
+            document
+                .querySelector(
+                    `.dropdown-item[data-list-id="${currentSelectedList}"]`
+                )
+                .remove();
+            updateSelectedList(firstListTitle, firstListId);
+        } else {
+            // Set to first list that's not the actual first list
+            const firstNotActualList = document.querySelector(
+                '.dropdown-item:not([data-list-id="' + firstListId + '"])'
+            );
+            console.log(firstNotActualList);
+			document
+				.querySelector(
+					`.dropdown-item[data-list-id="${firstListId}"]`
+				)
+				.remove();
+            if (firstNotActualList) {
+                // List has other elements other than the first list
+                const newTitle = firstNotActualList.textContent;
+                const newId = firstNotActualList.getAttribute("data-list-id");
+                dashboard.setAttribute("data-first-list-title", newTitle);
+                dashboard.setAttribute("data-first-list-id", newId);
+                updateSelectedList(newTitle, newId);
+            } else {
+				dashboard.removeAttribute("data-first-list-title")
+				dashboard.removeAttribute("data-first-list-id")
+				// Set list invisible
+				const cardBody = document.querySelector(".card-body");
+                cardBody.classList.add("d-none");
+				updateSelectedList(null, null);
+            }
+        }
     });
 });
 
 function updateSelectedList(listTitle, listId) {
-    document.getElementById("dropdownMenuButton").innerText = listTitle;
-    document
-        .getElementById("dropdownList")
-        .setAttribute("current-selected", listId);
+	if (listTitle) {
+		document.getElementById("dropdownMenuButton").innerText = listTitle;
+	} else {
+		document.getElementById("dropdownMenuButton").innerText = "No lists yet...";
+	}
+    const dropdown = document.getElementById("dropdownList");
+	dropdown.setAttribute("current-selected", listId);
     getListItems(listId);
 }
 
 function getListItems(listId) {
+    if (listId == null) {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = ""; // Clear existing tasks
+        return;
+    }
     fetch("/tasks/all/" + listId, {
         method: "GET",
         headers: {
@@ -142,15 +251,25 @@ function getListItems(listId) {
                 if (task.task_depth_level === 0) {
                     const listItem = document.createElement("li");
                     listItem.setAttribute("data-task-id", task.task_id);
-                    listItem.setAttribute("data-parent-task-id", task.parent_task_id);
-                    listItem.setAttribute("data-task-depth-level", task.task_depth_level)
-                    listItem.setAttribute("class", "ml-" + task.task_depth_level);
+                    listItem.setAttribute(
+                        "data-parent-task-id",
+                        task.parent_task_id
+                    );
+                    listItem.setAttribute(
+                        "data-task-depth-level",
+                        task.task_depth_level
+                    );
+                    listItem.setAttribute(
+                        "class",
+                        "ml-" + task.task_depth_level
+                    );
                     //   const parentTask = task.parent_task_id;
                     listItem.innerHTML = `
                         <div class="form-check d-flex justify-content-left">
                             <label class="form-check-label">
-                                <input class="checkbox" type="checkbox" ${task.completed ? "checked" : ""
-                        }>
+                                <input class="checkbox" type="checkbox" ${
+                                    task.completed ? "checked" : ""
+                                }>
                                 <i class="input-helper"></i>
                             </label>
                             <label class="form-open-dialog-label">
@@ -173,8 +292,14 @@ function getListItems(listId) {
                     if (task.task_depth_level === i) {
                         const listItem = document.createElement("li");
                         listItem.setAttribute("data-task-id", task.task_id);
-                        listItem.setAttribute("data-parent-task-id", task.parent_task_id);
-                        listItem.setAttribute("data-task-depth-level", task.task_depth_level)
+                        listItem.setAttribute(
+                            "data-parent-task-id",
+                            task.parent_task_id
+                        );
+                        listItem.setAttribute(
+                            "data-task-depth-level",
+                            task.task_depth_level
+                        );
                         listItem.setAttribute(
                             "class",
                             "ml-" + (task.task_depth_level * 2 + 1)
@@ -184,8 +309,9 @@ function getListItems(listId) {
                         listItem.innerHTML = `
                             <div class="form-check d-flex justify-content-left">
                                 <label class="form-check-label">
-                                    <input class="checkbox" type="checkbox" ${task.completed ? "checked" : ""
-                            }>
+                                    <input class="checkbox" type="checkbox" ${
+                                        task.completed ? "checked" : ""
+                                    }>
                                     <i class="input-helper"></i>
                                 </label>
                                 <label class="form-open-dialog-label">
@@ -194,10 +320,11 @@ function getListItems(listId) {
                                 </label>
                             </div>
                             <div class="task-button-group">
-                                ${i === maxLevelDepth
-                                ? addSubTaskButtonDisabled
-                                : addSubTaskButton
-                            }
+                                ${
+                                    i === maxLevelDepth
+                                        ? addSubTaskButtonDisabled
+                                        : addSubTaskButton
+                                }
                                 <i class="remove mdi mdi-close-circle-outline"></i>
                             </div>
                         `;
@@ -210,7 +337,10 @@ function getListItems(listId) {
 
                         if (parentTask) {
                             // Insert the new task before the parent task
-                            parentTask.parentNode.insertBefore(listItem, parentTask);
+                            parentTask.parentNode.insertBefore(
+                                listItem,
+                                parentTask
+                            );
                         } else {
                             // If the parent task is not found, append it to the taskList
                             // taskList.appendChild(listItem);
@@ -228,10 +358,10 @@ function getListItems(listId) {
 function addNewSubTask() {
     var target = event.target;
     var listItem = target.parentNode.parentNode;
-    
+
     console.log(listItem.getAttribute("data-task-id"));
     addNewTask(listItem.getAttribute("data-task-id"))
-    .then(function (task) {
+        .then(function (task) {
             var todoListInput = document.querySelector(".todo-list-input");
             // event.preventDefault();
             // var task = todoListInput.value;
@@ -239,15 +369,26 @@ function addNewSubTask() {
             if (task) {
                 const listItem = document.createElement("li");
                 listItem.setAttribute("data-task-id", task.id);
-                listItem.setAttribute("data-parent-task-id", task.parent_task_id);
+                listItem.setAttribute(
+                    "data-parent-task-id",
+                    task.parent_task_id
+                );
                 // Find the parent task
                 const parentTaskId = task.parent_task_id;
                 const parentTask = document.querySelector(
                     `[data-task-id="${parentTaskId}"]`
                 );
-                const parentTaskDepthLevel = parentTask.getAttribute('data-task-depth-level')
-                listItem.setAttribute("data-task-depth-level", (parseInt(parentTaskDepthLevel) + 1))
-                listItem.setAttribute("class", "ml-" + ((parseInt(parentTaskDepthLevel) + 1) * 2 + 1));
+                const parentTaskDepthLevel = parentTask.getAttribute(
+                    "data-task-depth-level"
+                );
+                listItem.setAttribute(
+                    "data-task-depth-level",
+                    parseInt(parentTaskDepthLevel) + 1
+                );
+                listItem.setAttribute(
+                    "class",
+                    "ml-" + ((parseInt(parentTaskDepthLevel) + 1) * 2 + 1)
+                );
 
                 const addSubTaskButtonDisabled = `<i class="add-sub-task-disabled mdi mdi-plus"></i>`;
                 const addSubTaskButton = `<i class="add-sub-task mdi mdi-plus" onclick="addNewSubTask()"></i>`;
@@ -264,14 +405,15 @@ function addNewSubTask() {
                         </label>
                         </div>
                         <div class="task-button-group">
-                            ${(parseInt(parentTaskDepthLevel) + 1) === maxLevelDepth
-                        ? addSubTaskButtonDisabled
-                        : addSubTaskButton
-                    }
+                            ${
+                                parseInt(parentTaskDepthLevel) + 1 ===
+                                maxLevelDepth
+                                    ? addSubTaskButtonDisabled
+                                    : addSubTaskButton
+                            }
                             <i class="remove mdi mdi-close-circle-outline"></i>
                         </div>
                     `;
-
 
                 todoListInput.value = "";
                 if (parentTask) {
@@ -290,50 +432,38 @@ function addNewSubTask() {
 }
 
 function addNewList() {
-    var newItemTitle = document.getElementById("newListInput").value;
-    if (newItemTitle.trim() !== "") {
-        // --HTML part--
-        var dropdownList = document.getElementById("dropdownList");
+    //  Make this return a promise
+    return new Promise((resolve, reject) => {
+        var newItemTitle = document.getElementById("newListInput").value;
+        if (newItemTitle.trim() !== "") {
+            // --AJAX part--
+            var postData = {
+                title: newItemTitle,
+                user_id: document
+                    .querySelector('[name="dashboard"]')
+                    .getAttribute("data-user-id"),
+            };
 
-        // Create a new dropdown item
-        var newDropdownItem = document.createElement("a");
-        newDropdownItem.classList.add("dropdown-item");
-        // newDropdownItem.href = "#";
-        newDropdownItem.textContent = newItemTitle;
-        newDropdownItem.onclick = function () {
-            updateSelectedList(newItemTitle);
-        };
-
-        // Append the new item to the dropdown menu
-        dropdownList.appendChild(newDropdownItem);
-
-        // Clear the input field after adding the item
-        document.getElementById("newListInput").value = "";
-
-        // --AJAX part--
-        var postData = {
-            title: newItemTitle,
-            user_id: document
-                .querySelector('[name="dashboard"]')
-                .getAttribute("data-user-id"),
-        };
-
-        fetch("/lists", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(postData),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                updateSelectedList(data.title, data.id)
-                console.log(data);
+            fetch("/lists", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(postData),
             })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
-    }
+                .then((response) => response.json())
+                .then((data) => {
+                    updateSelectedList(data.title, data.id);
+                    console.log(data);
+                    resolve(data);
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        } else {
+            reject(new Error("Invalid input for new task")); // Reject the promise with an error
+        }
+    });
 }
 
 function addNewTask(parentTaskId) {

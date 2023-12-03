@@ -1,4 +1,10 @@
-<div name="dashboard" data-user-id="{{ session['user_id'] }}" data-first-list-title="{{ user_lists[0].list_title }}" data-first-list-id="{{ user_lists[0].list_id }}">
+<div name="dashboard" data-user-id="{{ session['user_id'] }}"
+     {% if user_lists %}
+         data-first-list-title="{{ user_lists[0].list_title }}"
+         data-first-list-id="{{ user_lists[0].list_id }}"
+     {% endif %}>
+    <!-- Other content here -->
+</div>
     hello, {{ name }}!
 
     <div class="page-content page-container" id="page-content">
@@ -22,7 +28,9 @@
                             <div class="dropdown-menu"
                                 aria-labelledby="dropdownMenuButton"
                                 id="dropdownList"
-                                current-selected="{{user_lists[0].list_id}}">
+                                {% if user_lists %}
+                                    current-selected="{{user_lists[0].list_id}}"
+                                {% endif %}>
                                 {% for option in user_lists %}
                                 <a class="dropdown-item" data-list-id="{{ option.list_id }}"
                                     onclick="updateSelectedList('{{ option.list_title }}', '{{ option.list_id }}')">{{
@@ -35,13 +43,17 @@
                             placeholder="New list"
                             id="newListInput">
                         <button
-                            class="add btn btn-primary font-weight-bold user-list-add-btn"
-                            onclick="addNewList()">
+                            class="add btn btn-primary font-weight-bold user-list-add-btn">
                             Add new list</button>
                     </div>
                     <br>
                     <div class="card px-3">
-                        <div class="card-body">
+                        <div id="cardUiBody"
+                        {% if user_lists %} 
+                        class="card-body"
+                        {% else %}
+                        class="card-body d-none"
+                        {% endif %}>
                             <label id="deleteListLabel" class="card-title"> Delete List </label>
                             <div class="add-items d-flex"> <input type="text"
                                     class="form-control todo-list-input"
