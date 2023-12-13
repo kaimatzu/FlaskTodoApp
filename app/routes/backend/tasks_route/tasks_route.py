@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from app.database.tasks.tasks import create_task, get_all_list_tasks, get_all_task_sub_tasks, get_task_by_id, update_task, delete_task
+from app.database.tasks.tasks import create_task, get_all_list_tasks, get_all_task_sub_tasks, get_task_by_id, update_task, update_task_status, delete_task
 from app.main import app
 
 @app.route("/tasks", methods=["POST"])
@@ -30,7 +30,13 @@ def tasks_by_id(id):
         result = get_task_by_id(id)
     return jsonify(result)
 
-@app.route("/tasks/subtasks/<id>", methods=["GET"])
-def get_task_sub_tasks(id):
-    result = get_all_task_sub_tasks(5, id)
+# @app.route("/tasks/subtasks/<id>", methods=["GET"])
+# def get_task_sub_tasks(id):
+#     result = get_all_task_sub_tasks(5, id)
+#     return jsonify(result)
+  
+@app.route("/tasks/status/<id>", methods=["PUT"])
+def call_update_task_status(id):
+    data = request.get_json()
+    result = update_task_status(id, data) 
     return jsonify(result)

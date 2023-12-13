@@ -27,6 +27,13 @@ def update_task(id, data):
     data["id"] = row["id"]
     return data
 
+def update_task_status(id, data):
+    cur = execute("""CALL update_task_status(%s, %s)""",
+          (id, data["finished"]))
+    row = cur.fetchone()
+    data["id"] = row["id"]
+    return data
+
 def delete_task(id):
     cur = execute("""CALL delete_task(%s)""", (id,))
     row = cur.fetchone()

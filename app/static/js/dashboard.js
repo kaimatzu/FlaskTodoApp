@@ -136,16 +136,23 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 	});
 
-    todoListItem.addEventListener("change", function (event) {
+    todoListItem.addEventListener("change", function (event) { // <---- MARKER: CHANGING DONE STATUS
+        var status;
         var checkbox = event.target;
         if (checkbox.checked) {
             checkbox.removeAttribute("checked");
+            status = 1; // TRUE
         } else {
             checkbox.setAttribute("checked", "checked");
+            status = 0; // FALSE
         }
 
         var listItem = checkbox.closest("li");
         listItem.classList.toggle("completed");
+
+        const taskId = event.target.parentNode.parentNode.parentNode.getAttribute("data-task-id") 
+        console.log(taskId, status);
+        updateTaskStatus(taskId, status);
     });
 
     todoListItem.addEventListener("click", function (event) {
@@ -304,12 +311,17 @@ function getListItems(listId) {
                         "class",
                         "ml-" + task.task_depth_level
                     );
+                    if (task.finished) {
+                        var currentClass = listItem.getAttribute("class");     
+                        var newClass = currentClass + " completed";
+                        listItem.setAttribute("class", newClass);
+                    }
                     //   const parentTask = task.parent_task_id;
                     listItem.innerHTML = `
                         <div class="form-check d-flex justify-content-left">
                             <label class="form-check-label">
                                 <input class="checkbox" type="checkbox" ${
-                                    task.completed ? "checked" : ""
+                                    task.finished ? `checked="checked"` : ""
                                 }>
                                 <i class="input-helper"></i>
                             </label>
@@ -343,15 +355,20 @@ function getListItems(listId) {
                         );
                         listItem.setAttribute(
                             "class",
-                            "ml-" + (task.task_depth_level * 2 + 1)
+                            "ml-" + (task.task_depth_level * 2 + 1),
                         );
+                        if (task.finished) {
+                            var currentClass = listItem.getAttribute("class");     
+                            var newClass = currentClass + " completed";
+                            listItem.setAttribute("class", newClass);
+                        }
                         const addSubTaskButtonDisabled = `<i class="add-sub-task-disabled mdi mdi-plus"></i>`;
                         const addSubTaskButton = `<i class="add-sub-task mdi mdi-plus" onclick="addNewSubTask()"></i>`;
                         listItem.innerHTML = `
                             <div class="form-check d-flex justify-content-left">
                                 <label class="form-check-label">
                                     <input class="checkbox" type="checkbox" ${
-                                        task.completed ? "checked" : ""
+                                        task.finished ? `checked="checked"` : ""
                                     }>
                                     <i class="input-helper"></i>
                                 </label>
@@ -617,6 +634,27 @@ function openModal(taskName, taskId) {
 	getTaskNotes(taskId);
 	// Trigger the modal to show
 	$('#overlayModal').modal('show');
+}
+
+function updateTaskStatus(taskId, status) {
+    var postData = {
+        finished: status,
+    };
+
+    fetch("/tasks/status/" + taskId, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+    }) 
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
 }
 
 function deleteList(listId) {

@@ -44,6 +44,20 @@ BEGIN
 END $$$
 DELIMITER ;
 
+-- update task status
+DELIMITER $$$
+CREATE PROCEDURE update_task_status(
+    IN p_task_id INT,
+    IN p_finished BOOLEAN
+)
+BEGIN
+    UPDATE tasks 
+      SET finished = p_finished 
+      WHERE id = p_task_id;
+    SELECT p_task_id as id;
+END $$$
+DELIMITER ;
+
 -- delete task
 DELIMITER $$$
 CREATE PROCEDURE delete_task(

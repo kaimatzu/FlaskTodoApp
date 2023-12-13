@@ -29,7 +29,7 @@ GET {{host}}/tasks/subtasks/4
 Content-Type: application/json
 
 ### Read a single item by id
-GET {{host}}/tasks/4
+GET {{host}}/tasks/120
 Content-Type: application/json
 
 ### Update an item
@@ -38,6 +38,14 @@ Content-Type: application/json
 
 {
   "content": "test content"
+}
+
+### Update status of an item
+PUT {{host}}/tasks/status/120
+Content-Type: application/json
+
+{
+  "finished": 1
 }
 
 ### Delete an item
